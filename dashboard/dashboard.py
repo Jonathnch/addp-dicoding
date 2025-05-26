@@ -1,78 +1,68 @@
-import os 
 import pandas as pd
-import matplotlib.pyplot as plt                      
-import seaborn as sns
 import streamlit as st
-from babel.numbers import format_currency
+import seaborn as sns
+import matplotlib.pyplot as plt
 sns.set(style='dark')
 
-#Load data
-base_path = os.path.dirname(__file__)  # path ke folder tempat file Python ini berada
+# Load data
+bikeday = pd.read_csv("bikeday.csv")
+bikehour = pd.read_csv("bikehour.csv")
 
-bikeday_path = os.path.join(base_path, 'bikeday.csv')
-bikehour_path = os.path.join(base_path, 'bikehour.csv')
+st.title("Dashboard Peminjaman Sepeda")
+st.markdown("Menampilkan data peminjaman sepeda berdasarkan waktu dan musim.")
 
-bikeday = pd.read_csv(bikeday_path)
-bikehour = pd.read_csv(bikehour_path)
+# Filter musim dari sidebar
+season_dict = {1: "Spring", 2: "Summer", 3: "Fall", 4: "Winter"}
+season = st.sidebar.selectbox(
+    "Pilih Musim", options=[0, 1, 2, 3, 4],
+    format_func=lambda x: "Semua" if x == 0 else season_dict[x]
+)
 
-st.title('Bike Share Dashboard')
-st.markdown('This dashboard provides insights into bike share usage patterns.')
-
-# Sidebar filters
-st.sidebar.header('Filters')
-season_map = {1: 'Spring', 2: 'Summer', 3: 'Fall', 4: 'Winter'}
-
-season= st.sidebar.selectbox(
-    'Select Season',
-    options=[0, 1, 2, 3, 4], format_func=lambda x: "Semua" if x == 0 else season_map[x])
-
-# Filter data musiman jika dipilih
+# Jika musim dipilih, maka akan filter datanya
 if season != 0:
-    bikeday = bikeday[bikeday['season'] == season]
-    bikehour = bikehour[bikehour['season'] == season]
-    
-# Statistik umum
-total_rides = bikeday['cnt'].sum()
-total_hours = bikehour['cnt'].sum()
-avg_per_day = bikeday['cnt'].mean()
-avg_per_hour = bikehour['cnt'].mean()
+    bikeday = bikeday[bikeday["season"] == season]
+    bikehour = bikehour[bikehour["season"] == season]
 
+# Statistik dasar
+st.subheader("Statistik Umum")
 col1, col2 = st.columns(2)
-col1.metric("Total peminjaman harian", f"{total_rides:,}")
-col1.metric("Rata-rata per Hari", f"{avg_per_day:.2f}")
-col2.metric("Total peminjaman per Jam", f"{total_hours:,}")
-col2.metric("Rata-rata per Jam", f"{avg_per_hour:.2f}")
+col1.metric("Total Harian", f"{bikeday['cnt'].sum():,}")
+col1.metric("Rata-rata per Hari", f"{bikeday['cnt'].mean():.2f}")
+col2.metric("Total per Jam", f"{bikehour['cnt'].sum():,}")
+col2.metric("Rata-rata per Jam", f"{bikehour['cnt'].mean():.2f}")
 
-# Grafik Harian
-st.subheader('Grafik Peminjaman Harian')
-fig1, ax1 = plt.subplots(figsize=(12,4))
-bikeday['dteday'] = pd.to_datetime(bikeday['dteday'])
-sns.lineplot(data=bikeday, x='dteday', y='cnt', ax=ax1, marker='o', color='blue')
-ax1.set_xlabel('Tanggal')
-ax1.set_ylabel('Jumlah Peminjaman')
-fig1.autofmt_xdate()
+# Grafik per Jam
+st.subheader("Rata-rata Peminjaman per Jam")
+avg_hour = bikehour.groupby("hr")["cnt"].mean().reset_index()
+fig1, ax1 = plt.subplots(figsize=(12, 4))
+sns.barplot(data=avg_hour, x="hr", y="cnt", palette="viridis", ax=ax1)
+ax1.set_xlabel("Jam")
+ax1.set_ylabel("Rata-rata Peminjaman")
 st.pyplot(fig1)
 
-# Grafik Jam
-st.subheader('Grafik Peminjaman per Jam')
-fig2, ax2 = plt.subplots(figsize=(12,4))
-avg_hour = bikehour.groupby('hr')['cnt'].mean().reset_index()
-sns.barplot(data=avg_hour, x='hr', y='cnt', ax=ax2, palette='viridis')
-ax2.set_xlabel('Jam')
-ax2.set_ylabel('Rata-rata Peminjaman')
+# Grafik Harian
+st.subheader("Peminjaman Sepeda per Hari")
+bikeday["dteday"] = pd.to_datetime(bikeday["dteday"])
+fig2, ax2 = plt.subplots(figsize=(12, 4))
+sns.lineplot(data=bikeday, x="dteday", y="cnt", marker="o", color="blue", ax=ax2)
+ax2.set_xlabel("Tanggal")
+ax2.set_ylabel("Jumlah Peminjaman")
 st.pyplot(fig2)
 
-#Visualisasi Musiman
-st.subheader('Peminjaman Musiman')
+# Boxplot Musiman
+st.subheader("Distribusi Musiman")
 fig3, ax3 = plt.subplots()
-sns.boxplot(data=bikeday, x='season', y='cnt', ax=ax3, palette='Set2')
-ax3.set_xticklabels([season_map[i] for i in sorted(season_map.keys())])
+sns.boxplot(data=bikeday, x="season", y="cnt", palette="Set2", ax=ax3)
+ax3.set_xticklabels([season_dict[i] for i in sorted(season_dict.keys())])
 st.pyplot(fig3)
 
 # Hari kerja vs libur
-st.subheader("Hari kerja vs Hari libur")
-labels = ['Hari kerja', 'Hari libur']
-values = [bikeday[bikeday['workingday'] == 1]['cnt'].mean(), bikeday[bikeday['workingday'] == 0]['cnt'].mean()]
+st.subheader("Hari Kerja vs Hari Libur")
+labels = ["Hari Kerja", "Hari Libur"]
+values = [
+    bikeday[bikeday["workingday"] == 1]["cnt"].mean(),
+    bikeday[bikeday["workingday"] == 0]["cnt"].mean()
+]
 fig4, ax4 = plt.subplots()
-sns.barplot(x=labels, y=values, ax=ax4, palette='pastel')
+sns.barplot(x=labels, y=values, palette="pastel", ax=ax4)
 st.pyplot(fig4)
