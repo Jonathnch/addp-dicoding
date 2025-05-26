@@ -6,8 +6,8 @@ from babel.numbers import format_currency
 sns.set(style='dark')
 
 #Load data
-bikeday = pd.read_csv('bikeday.csv')
-bikehour = pd.read_csv('bikehour.csv')
+bikeday = pd.read_csv('./dashboard/bikeday.csv')
+bikehour = pd.read_csv('./dashboard/bikehour.csv')
 
 st.title('Bike Share Dashboard')
 st.markdown('This dashboard provides insights into bike share usage patterns.')
