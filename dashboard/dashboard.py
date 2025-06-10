@@ -7,12 +7,13 @@ from babel.numbers import format_currency
 sns.set(style='dark')
 
 #Load data
-base_path = os.path.dirname(os.path.abspath(__file__))
-bikeday_path = os.path.join(base_path, "data", "bikeday.csv")
-bikehour_path = os.path.join(base_path, "data", "bikehour.csv")
+current_dir = os.path.dirname(os.path.abspath(__file__))
 
-print("Loading from:", bikeday_path, bikehour_path)  # Debug path
+# Bangun path file CSV di folder yang sama
+bikeday_path = os.path.join(current_dir, "bikeday.csv")
+bikehour_path = os.path.join(current_dir, "bikehour.csv")
 
+# Load CSV
 bikeday_df = pd.read_csv(bikeday_path)
 bikehour_df = pd.read_csv(bikehour_path)
 
