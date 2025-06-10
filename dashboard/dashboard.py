@@ -29,14 +29,14 @@ season= st.sidebar.selectbox(
 
 # Filter data musiman jika dipilih
 if season != 0:
-    bikeday = bikeday[bikeday['season'] == season]
-    bikehour = bikehour[bikehour['season'] == season]
+    bikeday = bikeday_df[bikeday_df['season'] == season]
+    bikehour = bikehour_df[bikehour_df['season'] == season]
     
 # Statistik umum
-total_rides = bikeday['cnt'].sum()
-total_hours = bikehour['cnt'].sum()
-avg_per_day = bikeday['cnt'].mean()
-avg_per_hour = bikehour['cnt'].mean()
+total_rides = bikeday_df['cnt'].sum()
+total_hours = bikehour_df['cnt'].sum()
+avg_per_day = bikeday_df['cnt'].mean()
+avg_per_hour = bikehour_df['cnt'].mean()
 
 col1, col2 = st.columns(2)
 col1.metric("Total peminjaman harian", f"{total_rides:,}")
@@ -47,8 +47,8 @@ col2.metric("Rata-rata per Jam", f"{avg_per_hour:.2f}")
 # Grafik Harian
 st.subheader('Grafik Peminjaman Harian')
 fig1, ax1 = plt.subplots(figsize=(12,4))
-bikeday['dteday'] = pd.to_datetime(bikeday['dteday'])
-sns.lineplot(data=bikeday, x='dteday', y='cnt', ax=ax1, marker='o', color='blue')
+bikeday['dteday'] = pd.to_datetime(bikeday_df['dteday'])
+sns.lineplot(data=bikeday_df, x='dteday', y='cnt', ax=ax1, marker='o', color='blue')
 ax1.set_xlabel('Tanggal')
 ax1.set_ylabel('Jumlah Peminjaman')
 fig1.autofmt_xdate()
@@ -57,7 +57,7 @@ st.pyplot(fig1)
 # Grafik Jam
 st.subheader('Grafik Peminjaman per Jam')
 fig2, ax2 = plt.subplots(figsize=(12,4))
-avg_hour = bikehour.groupby('hr')['cnt'].mean().reset_index()
+avg_hour = bikehour_df.groupby('hr')['cnt'].mean().reset_index()
 sns.barplot(data=avg_hour, x='hr', y='cnt', ax=ax2, palette='viridis')
 ax2.set_xlabel('Jam')
 ax2.set_ylabel('Rata-rata Peminjaman')
@@ -66,14 +66,14 @@ st.pyplot(fig2)
 #Visualisasi Musiman
 st.subheader('Peminjaman Musiman')
 fig3, ax3 = plt.subplots()
-sns.boxplot(data=bikeday, x='season', y='cnt', ax=ax3, palette='Set2')
+sns.boxplot(data=bikeday_df, x='season', y='cnt', ax=ax3, palette='Set2')
 ax3.set_xticklabels([season_map[i] for i in sorted(season_map.keys())])
 st.pyplot(fig3)
 
 # Hari kerja vs libur
 st.subheader("Hari kerja vs Hari libur")
 labels = ['Hari kerja', 'Hari libur']
-values = [bikeday[bikeday['workingday'] == 1]['cnt'].mean(), bikeday[bikeday['workingday'] == 0]['cnt'].mean()]
+values = [bikeday_df[bikeday_df['workingday'] == 1]['cnt'].mean(), bikeday_df[bikeday_df['workingday'] == 0]['cnt'].mean()]
 fig4, ax4 = plt.subplots()
 sns.barplot(x=labels, y=values, ax=ax4, palette='pastel')
 st.pyplot(fig4)
