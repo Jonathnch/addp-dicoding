@@ -7,13 +7,14 @@ from babel.numbers import format_currency
 sns.set(style='dark')
 
 #Load data
-base_path = os.path.dirname(__file__)  # path ke folder tempat file Python ini berada
+base_path = os.path.dirname(os.path.abspath(__file__))
+bikeday_path = os.path.join(base_path, "data", "bikeday.csv")
+bikehour_path = os.path.join(base_path, "data", "bikehour.csv")
 
-bikeday_path = os.path.join(base_path, 'bikeday.csv')
-bikehour_path = os.path.join(base_path, 'bikehour.csv')
+print("Loading from:", bikeday_path, bikehour_path)  # Debug path
 
-bikeday = pd.read_csv(bikeday_path)
-bikehour = pd.read_csv(bikehour_path)
+bikeday_df = pd.read_csv(bikeday_path)
+bikehour_df = pd.read_csv(bikehour_path)
 
 st.title('Bike Share Dashboard')
 st.markdown('This dashboard provides insights into bike share usage patterns.')
