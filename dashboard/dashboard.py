@@ -1,4 +1,3 @@
-import os 
 import pandas as pd
 import matplotlib.pyplot as plt                      
 import seaborn as sns
@@ -7,13 +6,8 @@ from babel.numbers import format_currency
 sns.set(style='dark')
 
 #Load data
-base_path = os.path.dirname(__file__)  # path ke folder tempat file Python ini berada
-
-bikeday_path = os.path.join(base_path, 'bikeday.csv')
-bikehour_path = os.path.join(base_path, 'bikehour.csv')
-
-bikeday = pd.read_csv(bikeday_path)
-bikehour = pd.read_csv(bikehour_path)
+bikeday = pd.read_csv('data/bikeday.csv')
+bikehour = pd.read_csv('data/bikehour.csv')
 
 st.title('Bike Share Dashboard')
 st.markdown('This dashboard provides insights into bike share usage patterns.')
