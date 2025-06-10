@@ -3,11 +3,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
 from babel.numbers import format_currency
+import os
 sns.set(style='dark')
 
 #Load data
-bikeday = pd.read_csv('bikeday.csv')
-bikehour = pd.read_csv('bikehour.csv')
+base_path = os.path.dirname(os.path.abspath(__file__))
+bikeday_path = os.path.join(base_path, "bikeday.csv")
+bikehour_path = os.path.join(base_path, "bikehour.csv")
+
+# Load data
+bikeday = pd.read_csv(bikeday_path)
+bikehour = pd.read_csv(bikehour_path)
 
 st.title('Bike Share Dashboard')
 st.markdown('This dashboard provides insights into bike share usage patterns.')
